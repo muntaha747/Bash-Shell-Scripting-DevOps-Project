@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # 1. Ensure the script is run as root
 if [[ $UID != 0 ]]; then
@@ -57,7 +57,7 @@ log_message " This portion is executed"
 
 # Function to upload backup in the AWS s3 Bucket
 copyto_s3() {
-    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws s3 cp ${ZIP_FILE_NAME}} s3://wezvatech-jenkins-backup-9739110917/
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws s3 cp ${ZIP_FILE_NAME}} s3://${S3_Bucket}
     exitcode=$?
     if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
       exit $exitcode
@@ -67,3 +67,11 @@ copyto_s3() {
 
 
 
+# Now calling the main functions of the scripts.
+
+if [[ -z ${JENKINS_PATH}]]; then
+    echo "useage: ${basename $0} path to /var/lib/jenkins"
+    ecit 1
+fi
+
+rm -rf "${placement_dir}" 
