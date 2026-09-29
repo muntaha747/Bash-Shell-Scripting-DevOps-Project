@@ -2,15 +2,13 @@
 
 # --- Common Variables ---
 JENKINS_PATH="$1"                   # Folder where Jenkins lives (e.g., /var/lib/jenkins)
-AWS_ACCESS_KEY_ID="$2"                       
-AWS_SECRET_ACCESS_KEY="$3"                     
+export AWS_ACCESS_KEY_ID="$2"
+export AWS_SECRET_ACCESS_KEY="$3"
 S3_BUCKET="jenkins-metadata-backup"
 STAGING_DIR="/tmp/jenkins-backup"
 LOG_FILE="/var/log/jenkins_backup.log"
 DATE_STAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 TAR_FILE="/tmp/jenkins-backup-${DATE_STAMP}.tar.gz"
-
-
 
 # 1. Ensure the script is run as root
 if [[ $UID != 0 ]]; then
@@ -18,58 +16,65 @@ if [[ $UID != 0 ]]; then
     exit 1
 fi
 
-
 # 2. Check that all required inputs are provided when running the script
 if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
     echo "Usage: $0 <JENKINS_PATH> <AWS_KEY> <AWS_SECRET>"
     exit 1
 fi
 
-# Creating Functions to be executed.
-# Writes log message timestamped entries to the log file.
+# --- FUNCTIONS ---
+
+# Writes timestamped entries to the log file
 log_messages() {
     echo "$(date +"%Y-%m-%d_%H-%M-%S") - ${1}" >> "${LOG_FILE}"
 }
-#Function to create an aws s3 bucket.
+
+# Function to upload backup tar to S3 bucket
 copy_to_s3() {
-    AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
-    AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
     aws s3 cp "${TAR_FILE}" "s3://${S3_BUCKET}/"
+    if [[ $? -ne 0 ]]; then
+        log_messages "ERROR: S3 upload failed"
+        return 1
+    fi
+    log_messages "Uploaded ${TAR_FILE} to s3://${S3_BUCKET}/"
 }
 
-#Function to create backup Jenkins jobs
+# Function to copy Jenkins job config files
 jenkins_job() {
     if [[ ! -d "${JENKINS_PATH}/jobs" ]]; then
-            echo "This is not a directory"
-            exit 1
+        echo "Error: ${JENKINS_PATH}/jobs does not exist."
+        exit 1
     fi
 
-    for i in "${JENKINS_PATH}/jobs"/*;
-    do
+    for i in "${JENKINS_PATH}/jobs"/*; do
         [[ -d "${i}" ]] || continue
+
         job_name=$(basename "$i")
         destination_folder="${STAGING_DIR}/jobs/${job_name}"
         mkdir -p "${destination_folder}"
-        find "${i}" -maxdepth 1 \( -name "config.xml" -o -name "nextBuildNumber" -o -name "builds/" \) -exec cp -R {} "${destination_folder}" \;
+
+        find "${i}" -maxdepth 1 \
+             \( -name "config.xml" -o -name "nextBuildNumber" \) \
+             -exec cp -R {} "${destination_folder}" \;
     done
-    
-    log_message "Jobs are copied from the "${JENKINS_PATH}/jobs" and pasted in the ${destination_folder}"
+
+    log_messages "Jobs copied from ${JENKINS_PATH}/jobs"
 }
 
-#Function to convert all the files into one folder and tar it.
-
-zip() {
-    tar -cvzf "${TAR_FILE}" "${STAGING_DIR}"
+# Function to create the archive
+make_archive() {
+    tar -czf "${TAR_FILE}" "${STAGING_DIR}"
+    log_messages "Created archive ${TAR_FILE}"
 }
 
-# Main and calling the functions.
+# --- MAIN ---
+
 if [[ -z "${JENKINS_PATH}" ]]; then
-    echo "The Path is empty and the folder is empty. Unfortunately the script cannot be executed"
+    echo "The Path is empty. Unfortunately the script cannot be executed."
+    log_messages "The script cannot be executed - empty JENKINS_PATH"
     exit 1
 fi
-    log_messages "The script cannot be executed"    
 
-if [[ -e "${STAGING_DIR}" || "${TAR_FILE}" ]]; then
-    rm -rf "${STAGING_DIR}"; rm -rf "${TAR_FILE}"
-else
-    echo "The ${STAGING_DIR} and ${TAR_FILE}"
+rm -rf "${STAGING_DIR}" "${TAR_FILE}"
+
+# (Point 3 onwards not written yet)
