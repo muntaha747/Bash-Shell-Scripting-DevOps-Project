@@ -1,10 +1,23 @@
 #!/bin/bash
 
+# --- Common Variables ---
+JENKINS_PATH="$1"                   # Folder where Jenkins lives (e.g., /var/lib/jenkins)
+AWS_ACCESS_KEY_ID="$2"                       
+AWS_SECRET_ACCESS_KEY="$3"                     
+S3_BUCKET="jenkins-metadata-backup"
+STAGING_DIR="/tmp/jenkins-backup"
+LOG_FILE="/var/log/jenkins_backup.log"
+DATE_STAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+TAR_FILE="/tmp/jenkins-backup-${DATE_STAMP}.tar.gz"
+
+
+
 # 1. Ensure the script is run as root
 if [[ $UID != 0 ]]; then
     echo "Error: Please run this script as root."
     exit 1
 fi
+
 
 # 2. Check that all required inputs are provided when running the script
 if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
@@ -12,66 +25,18 @@ if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
     exit 1
 fi
 
-# --- Common Variables ---
-JENKINS_PATH="$1"                   # Folder where Jenkins lives (e.g., /var/lib/jenkins)
-AWS_KEY="$2"                        # AWS Access Key ID
-AWS_SECRET="$3"                     # AWS Secret Access Key
-S3_BUCKET="jenkins-metadata-backup" # S3 destination bucket
-
-# Temporary folders & file paths
-WORK_DIR="/tmp/jenkins-backup"
-DATE_STAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-ZIP_FILE_NAME="jenkins-archive-${DATE_STAMP}.tar.gz"
-ZIP_FILE_PATH="/tmp/${ZIP_NAME}"
-LOG_FILE="/var/log/jenkins_backup.log"
-
-
-# --- FUNCTIONS ---
-
-# Writes timestamped entries to the log file
-log_message() {
-    echo "$(date +"%A, %d %B %Y %I:%M %p") - $1" >> "${LOG_FILE}"
+# Creating Functions to be executed.
+# Writes log message timestamped entries to the log file.
+log_messages() {
+    echo "$(date +"%Y-%m-%d_%H-%M-%S") - ${1}" >> "${LOG_FILE}"
 }
+#Function to create an aws s3 bucket.
+copy_to_s3() {
+    AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+    AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+    aws s3 cp "${TAR_FILE}" "S3://${S3_BUCKET}/"
 
-
-# Copies job configuration files into the temporary backup folder
-backup_jobs() {
-    if [[ ! -d "${JENKINS_PATH}" ]]; then
-        echo " This is not the directory and the script will not be executed"
-    fi
-
-    for i in "${JENKINS_PATH}/jobs"/*;
-    do
-        if [[ -d "${i}" ]]; then
-            cd "${JENKINS_PATH}"
-            job_name=$(basename "${i}")
-            placement_dir="${WORK_DIR}"/jobs/"${job_name}" # This is the directory which we created to store the backup
-            mkdir -p "${placement_dir}" # This is the directory which we created to store the backup from the command below.
-            find ${i} -maxdepth 1 \( -name "builds" || -name "*.xml" || -name "nextBuilderNumber" \) -exec cp -R {} "${placement_dir}" \;
-
-        fi
-    done
-
-log_message " This portion is executed"
-}
-
-# Function to upload backup in the AWS s3 Bucket
-copyto_s3() {
-    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws s3 cp ${ZIP_FILE_NAME}} s3://${S3_Bucket}
-    exitcode=$?
-    if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
-      exit $exitcode
-    fi
-    log_message "Copied Jenkins backup tar to S3 bucket .."
 }
 
 
 
-# Now calling the main functions of the scripts.
-
-if [[ -z ${JENKINS_PATH}]]; then
-    echo "useage: ${basename $0} path to /var/lib/jenkins"
-    ecit 1
-fi
-
-rm -rf "${placement_dir}" 
