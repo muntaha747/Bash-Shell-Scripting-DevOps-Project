@@ -77,4 +77,6 @@ fi
 
 rm -rf "${STAGING_DIR}" "${TAR_FILE}"
 
-# (Point 3 onwards not written yet)
+# Creating a for loop to create 5 subs folders.
+
+for i in "${JENKINS_PATH}/logs jobs secrets users plugins
