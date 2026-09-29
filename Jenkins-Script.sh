@@ -79,8 +79,13 @@ rm -rf "${STAGING_DIR}" "${TAR_FILE}"
 
 # Creating a for loop to create 5 subs folders.
 
-for i in "${JENKINS_PATH}/plugins" "${JENKINS_PATH}/jobs" "${JENKINS_PATH}/secrets" "${JENKINS_PATH}/logs" "${JENKINS_PATH}/workspace" "${JENKINS_PATH}/nodes" 
+for i in plugins jobs secrets logs workspace nodes
 do
-    mkdir -p "${STAGING_DIR}" "${i}"
-
+    mkdir -p "${STAGING_DIR}"/"${i}"
+    log_messages "Back up of each folders are done"
 done
+
+cp "${JENKINS_PATH}/"*.xml "${STAGING_DIR}" 2>/dev/null || true
+
+#Copying plugin files to the staging area
+cp "${JENKINS_PATH}/plugins/"[hj]pi "${STAGING_DIR}"/plugins 2>/dev/null || true
