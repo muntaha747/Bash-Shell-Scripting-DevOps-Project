@@ -34,9 +34,39 @@ log_messages() {
 copy_to_s3() {
     AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
     AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
-    aws s3 cp "${TAR_FILE}" "S3://${S3_BUCKET}/"
-
+    aws s3 cp "${TAR_FILE}" "S3://${s3_BUCKET}/"
 }
 
+#Function to create backup Jenkins jobs
+jenkins_job() {
+    if [[ ! -d "${JENKINS_PATH}/jobs"]]; then
+            echo "This is not a directory"
+            exit 1
+    fi
+
+    for i in "${JENKINS_PATH}/jobs"/*;
+    do
+        [[ -d "${i}" ]] || continue
+        job_name=$(basename "$i")
+        destination_folder="${STAGING_DIR}/jobs/${job_name}"
+        mkdir -p "${dest}"
+        find "${i}" -maxdepth 1 \( -name "config.xml" -o -name "nextBuilderNumber" -o -name builds/ \) -exec cp -R {} "${destination_folder}" \;
+    done
+    
+    log_message "Jobs are copied from the "${JENKINS_PATH}/jobs" and pasted in the ${destination_folder}"
+}
+
+#Function to convert all the files into one folder and tar it.
+
+zip() {
+    tar -cvzf "${TAR_FILE}" "${STAGING_DIR}"
+}
+
+# Main and calling the functions.
+if [[ -z "${JENKINS_PATH}"]]; then
+    echo "The Path is empty and the folder is empty. Unfortunately the script cannot be executed"
+    exit 1
+    log messages "The script cannot be executed"
+fi
 
 
