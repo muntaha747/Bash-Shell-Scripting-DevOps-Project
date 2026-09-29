@@ -109,3 +109,12 @@ fi
 if [ -n "$(ls -A "${JENKINS_PATH}/nodes/" 2>/dev/null)" ]; then
     cp -R "${JENKINS_PATH}/nodes/"* "${STAGING_DIR}/nodes/" 2>/dev/null || true
 fi
+
+if [ -n "$(ls -A "${JENKINS_PATH}/jobs/" 2>/dev/null)" ]; then
+    jenkins_job
+fi
+
+make_archive
+rm -rf "${STAGING_DIR}"
+copy_to_s3
+echo "Backing up the script is done and now sit back, relax and enjoy"
