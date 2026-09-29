@@ -87,5 +87,25 @@ done
 
 cp "${JENKINS_PATH}/"*.xml "${STAGING_DIR}" 2>/dev/null || true
 
-#Copying plugin files to the staging area
-cp "${JENKINS_PATH}/plugins/"[hj]pi "${STAGING_DIR}"/plugins 2>/dev/null || true
+#Copying all the jenkins folder metadata files to the staging area
+cp "${JENKINS_PATH}/plugins/"*.[hj]pi "${STAGING_DIR}/plugins/" 2>/dev/null || true
+
+if [ -n "$(ls -A "${JENKINS_PATH}/users/" 2>/dev/null)" ]; then
+    cp -R "${JENKINS_PATH}/users/"* "${STAGING_DIR}/users/" 2>/dev/null || true
+fi
+
+if [ -n "$(ls -A "${JENKINS_PATH}/secrets/" 2>/dev/null)" ]; then
+    cp -R "${JENKINS_PATH}/secrets/"* "${STAGING_DIR}/secrets/" 2>/dev/null || true
+fi
+
+if [ -n "$(ls -A "${JENKINS_PATH}/logs/" 2>/dev/null)" ]; then
+    cp -R "${JENKINS_PATH}/logs/"* "${STAGING_DIR}/logs/" 2>/dev/null || true
+fi
+
+if [ -n "$(ls -A "${JENKINS_PATH}/workspace/" 2>/dev/null)" ]; then
+    cp -R "${JENKINS_PATH}/workspace/"* "${STAGING_DIR}/workspace/" 2>/dev/null || true
+fi
+
+if [ -n "$(ls -A "${JENKINS_PATH}/nodes/" 2>/dev/null)" ]; then
+    cp -R "${JENKINS_PATH}/nodes/"* "${STAGING_DIR}/nodes/" 2>/dev/null || true
+fi
