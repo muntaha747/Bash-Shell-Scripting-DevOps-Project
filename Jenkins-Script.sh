@@ -34,7 +34,7 @@ log_messages() {
 copy_to_s3() {
     AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
     AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
-    aws s3 cp "${TAR_FILE}" "s3://${s3_BUCKET}/"
+    aws s3 cp "${TAR_FILE}" "s3://${S3_BUCKET}/"
 }
 
 #Function to create backup Jenkins jobs
