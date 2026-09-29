@@ -79,4 +79,4 @@ rm -rf "${STAGING_DIR}" "${TAR_FILE}"
 
 # Creating a for loop to create 5 subs folders.
 
-for i in "${JENKINS_PATH}/logs jobs secrets users plugins
+for i in "${JENKINS_PATH}/plugins" "${JENKINS_PATH}/jobs" "${JENKINS_PATH}/secrets" "${JENKINS_PATH}/logs" "${JENKINS_PATH}/workspace"
