@@ -1,7 +1,7 @@
 #!/bin/bash
+#Description: This Script takes the Jenkins Metadata Backup and compress the file by using tar -cvzf command and uploads automatically AWS s3 Bucket. The AWS Credentials are passed dynamically.
 
-# --- Common Variables ---
-JENKINS_PATH="$1"                   # Folder where Jenkins lives (e.g., /var/lib/jenkins)
+JENKINS_PATH="$1"                   
 export AWS_ACCESS_KEY_ID="$2"
 export AWS_SECRET_ACCESS_KEY="$3"
 S3_BUCKET="jenkins-metadata-backup"
