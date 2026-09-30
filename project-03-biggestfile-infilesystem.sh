@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 echo "This program get the first 10 biggest file in the file system passed via positional arguements"
 path="$1"
 echo ${path}
