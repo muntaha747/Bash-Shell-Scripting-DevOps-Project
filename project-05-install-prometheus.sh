@@ -1,6 +1,10 @@
 #!/bin/bash
 echo "Downloading the Prometheus Binaries"
+
 if [[ -e /home/ubuntu/prometheus-3.15.0.linux-amd64.tar.gz ]]; then
+    echo "The file is already exsisted in our system and it will not be extracted and downloaded"
+
+elif [[ -e /home/ubuntu/prometheus-3.15.0.linux-amd64.tar.gz ]]; then
     echo "The file is already exsist in your system so no need to download it again."
     tar -zxvf /home/ubuntu/prometheus-3.15.0.linux-amd64.tar.gz
 
