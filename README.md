@@ -8,14 +8,18 @@ A bunch of bash scripts I've written while learning Linux automation on my own E
 
 | Script | What it does |
 |---|---|
-| [`jenkins_backup.sh`](#-jenkins_backupsh) | Backs up Jenkins home dir and uploads to S3 |
-| [`docker_cleanup.sh`](#-docker_cleanupsh) | Cleans up unused Docker images, containers, volumes |
-| [`install_git.sh`](#-install_gitsh) | Installs git using the right package manager |
-| [`install_prometheus.sh`](#-install_prometheussh) | Downloads and extracts Prometheus |
-| [`disk_usage.sh`](#-disk_usagesh) | Alerts when disk usage crosses 80% |
-| [`biggest_files.sh`](#-biggest_filessh) | Lists the top 5 biggest files in a path |
-| [`delete_old_files.sh`](#-delete_old_filessh) | Deletes files older than 30 days |
-
+| [`arguments.sh`](#-argumentssh) | Shows how positional arguments and argument count work |
+| [`project-01-gitinstall.sh`](#-project-01-gitinstallsh) | Installs git using the right package manager for the OS |
+| [`project-02-disk-utilization.sh`](#-project-02-disk-utilizationsh) | Alerts when disk usage crosses 80% |
+| [`project-03-biggestfile-infilesystem.sh`](#-project-03-biggestfile-infilesystemsh) | Lists the top 5 biggest files in a path |
+| [`project-04-delete-old-log.sh`](#-project-04-delete-old-logsh) | Deletes files older than 30 days |
+| [`project-05-install-prometheus.sh`](#-project-05-install-prometheussh) | Downloads and extracts Prometheus |
+| [`project-06-forloop.sh`](#-project-06-forloopsh) | Loops through folders and removes test directories |
+| [`project-07-docker-service-status.sh`](#-project-07-docker-service-statussh) | Checks whether Docker is running |
+| [`project-08-Crontab-Docker-service.sh`](#-project-08-crontab-docker-servicesh) | Checks Docker status and starts it if it's down |
+| [`project-09-Install-software-with-positional-args.sh`](#-project-09-install-software-with-positional-argssh) | Installs multiple packages from positional arguments |
+| [`Project-A-Docker-Shell.sh`](#-project-a-docker-shellsh) | Docker utility shell script |
+| [`Project-B-Jenkins-Script.sh`](#-project-b-jenkins-scriptsh) | Jenkins backup and management script |
 ---
 
 ## 🗂 jenkins_backup.sh
